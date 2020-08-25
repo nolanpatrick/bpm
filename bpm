@@ -1,0 +1,51 @@
+#!/bin/bash
+echo "==============="
+echo "Welcome to bpm!"
+echo "==============="
+echo
+echo "Please select your package manager:"
+echo "1. apt/deb (Debian, Ubuntu, etc.)"
+echo "2. dnf/rpm (Fedora, CentOS, RHEL, etc.)"
+echo
+
+dependencies() {
+if [[ ! -f /usr/bin/wget || ! -f /usr/bin/curl || ! -f /usr/bin/tar ]]
+then
+	echo "Installing dependencies..."
+	$1 install -y wget curl tar &> bpm.log
+fi
+}
+
+read -r
+if [[ $REPLY == "1" ]]
+then
+	dependencies apt
+	pm=$(apt)
+fi
+if [[ $REPLY == "2" ]]
+then
+	dependencies dnf
+	pm=$(dnf)
+fi
+echo
+
+echo "Checking for dependencies..."
+
+read -p "Install [a]ll packages in package-scripts directory, or [s]elect individual packages? [a/s]: " -r
+echo
+if [[ $REPLY =~ ^[Aa]$ ]]
+then
+	for script in $PWD/package-scripts/*; do bash $script; done
+fi
+if [[ $REPLY =~ ^[Ss]$ ]]
+then
+	echo "Available packages: "
+	for script in $PWD/package-scripts/*; do echo "$(basename "$script")"; done
+	echo
+	read -p "Enter package names, separated by spaces: " packages
+	for script in $packages; do bash package-scripts/$script; done
+fi
+
+
+
+echo "END"
