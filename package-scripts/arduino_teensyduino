@@ -1,0 +1,37 @@
+#!/bin/bash
+echo "Checking latest version..."
+ardver=$(curl -s https://github.com/arduino/Arduino/releases/latest | head -c -31 | tail -c +84)
+tdver=$(curl -s https://www.pjrc.com/teensy/td_download.html | grep "Download Teensyduino" | head -c -6 | tail -c +35)
+echo
+echo "========================"
+echo "User:" $SUDO_USER
+echo
+echo "Downloading versions:"
+echo "Arduino:" ${ardver}
+echo "Teensyduino:" ${tdver}
+echo "========================"
+echo
+echo "Downloading and extracting Arduino IDE" ${ardver}"..."
+echo
+wget https://downloads.arduino.cc/arduino-${ardver}-linux64.tar.xz -P /tmp/
+tar -C /opt/ -xvf /tmp/arduino-${ardver}-linux64.tar.xz
+echo
+echo "Downloading Teensy udev rules..."
+echo
+wget https://www.pjrc.com/teensy/49-teensy.rules -P /tmp/
+cp /tmp/49-teensy.rules /etc/udev/rules.d/
+echo
+echo "Downloading Teensyduino" ${tdver}"..."
+echo
+wget https://www.pjrc.com/teensy/td_${tdver//./}/TeensyduinoInstall.linux64 -P /tmp/
+chmod +x /tmp/TeensyduinoInstall.linux64
+echo
+echo "** Set installation directory to: /opt/arduino-${ardver}/ **"
+/tmp/TeensyduinoInstall.linux64
+echo "Finishing up..."
+usermod -aG dialout ${SUDO_USER}
+/opt/arduino-${ardver}/install.sh
+
+rm -rf /tmp/arduino-${ardver}-linux64.tar.xz*
+rm -rf /tmp/TeensyduinoInstall.linux64*
+rm -rf /tmp/49-teensy.rules*
