@@ -1,2 +1,2 @@
 # bpm
-My custom, extremely primitive package manager
+An extremely primitive package management script. Mainly just an excuse to practice bash scripting.
